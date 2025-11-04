@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sevgilime Sürpriz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700;900&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0f1724; /* koyu gece */
+      --card:#0b1220cc;
+      --accent:#ff6b81;
+      --muted:#aab3c4;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Montserrat,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
+    body{background: radial-gradient(ellipse at 20% 10%, rgba(255,107,129,0.06), transparent 10%), linear-gradient(180deg,#07101a 0%, #081026 100%); color:white;overflow-x:hidden}
+    .container{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px}
+
+    .card{width:100%;max-width:980px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));backdrop-filter:blur(6px);border-radius:20px;padding:28px;box-shadow:0 10px 30px rgba(2,6,23,0.6);position:relative;overflow:hidden}
+
+    header{display:flex;gap:20px;align-items:center}
+    .avatar{width:120px;height:120px;border-radius:18px;flex:0 0 120px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,0.6);border:3px solid rgba(255,255,255,0.04)}
+    .avatar img{width:100%;height:100%;object-fit:cover;display:block}
+    .title h1{font-family:'Dancing Script',cursive;font-weight:700;font-size:46px;margin:0 0 6px 0}
+    .title p{margin:0;color:var(--muted)}
+
+    .grid{display:grid;grid-template-columns:1fr 360px;gap:24px;margin-top:18px}
+    @media (max-width:900px){.grid{grid-template-columns:1fr;}.avatar{width:96px;height:96px}}
+
+    .letter{padding:18px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));min-height:260px}
+    .letter h2{margin-top:0;color:var(--accent)}
+    .letter p{line-height:1.6;color:#e8eef8}
+
+    .sidebar{position:relative;padding:18px;border-radius:12px;background:linear-gradient(180deg, rgba(0,0,0,0.12), rgba(0,0,0,0.06));min-height:260px}
+    .btn{display:inline-block;padding:12px 18px;border-radius:12px;background:linear-gradient(90deg,var(--accent),#ff9aa2);color:white;font-weight:700;text-decoration:none;cursor:pointer;border:none}
+    .small{font-size:14px;color:var(--muted)}
+
+    .surprise{margin-top:14px}
+    .coupon{margin-top:12px;padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px dashed rgba(255,255,255,0.04)}
+    .hearts{position:absolute;left:0;right:0;top:0;bottom:0;pointer-events:none}
+
+    footer{display:flex;justify-content:space-between;align-items:center;margin-top:18px;color:var(--muted);font-size:13px}
+
+    /* küçük animasyonlar */
+    .pulse{animation:pulse 2s infinite}
+    @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
+
+    .hidden{display:none}
+
+    /* confetti canvas konumu */
+    #confettiCanvas{position:fixed;left:0;top:0;pointer-events:none;width:100%;height:100%;z-index:40}
+
+    /* küçük stil düzenlemeleri */
+    .music{border-radius:10px;overflow:hidden}
+    .signature{font-family:'Dancing Script',cursive;font-size:22px;margin-top:14px}
+
+  </style>
+</head>
+<body>
+  <canvas id="confettiCanvas"></canvas>
+  <div class="container">
+    <div class="card" role="main" aria-live="polite">
+      <div class="hearts" id="heartLayer"></div>
+      <header>
+        <div class="avatar">
+          <!-- SEVGILI_RESIM: replace with your image as 'hero.jpg' or change src -->
+          <img id="heroImg" src="hero.jpg" alt="Sevgilin" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=400 height=400><rect width=100% height=100% fill=%23081a2a/></svg>'"/>
+        </div>
+        <div class="title">
+          <h1 id="headline">Seni çok seviyorum, <span id="loverName">SEVGILI_ISMI</span> 💖</h1>
+          <p id="subtitle">Her günüm seninle daha güzel — küçük sürprizler için aşağıya göz at :)</p>
+        </div>
+      </header>
+
+      <div class="grid">
+        <section class="letter" id="letter">
+          <h2>Bir sürpriz mektup</h2>
+          <p id="loveText">Bugün sana bu küçük sayfayı hazırladım çünkü her anını daha özel kılmak istiyorum. Seninle güldüğüm, seninle hayal kurduğum için çok şanslıyım. Her baktığımda içimi ısıtan o gülüşün, en karanlık günümü aydınlatıyor. Seni düşündüğümde kalbim hızlanıyor; iyi ki varsın.</p>
+
+          <p class="signature">— <span id="yourName">YOUR_NAME</span></p>
+
+          <div style="margin-top:14px;">
+            <button class="btn" id="revealBtn">Sürprizi Göster 🎁</button>
+            <button class="btn" id="toggleHearts" style="margin-left:8px;background:linear-gradient(90deg,#ffd1dc,#ff6b81)">Kalpler</button>
+          </div>
+        </section>
+
+        <aside class="sidebar">
+          <div class="small">Çalma listesi</div>
+          <div class="music" style="margin-top:8px">
+            <!-- YOUTUBE MÜZİK EMBED: replace with desired embed URL -->
+            <iframe id="musicFrame" width="100%" height="180" src="https://www.youtube.com/watch?v=f0JVwF_bHDI&list=RDf0JVwF_bHDI&start_radio=1" title="YouTube music" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+
+          <div class="surprise">
+            <div class="small">Sürpriz kuponu</div>
+            <div class="coupon" id="coupon">
+              <strong>1 ücretsiz sarılma </strong>
+              <div style="margin-top:8px;color:var(--muted);font-size:13px">Kullanmak için butona bas.</div>
+              <div style="margin-top:8px">
+                <button class="btn" id="claimCoupon">Kullan</button>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px;color:var(--muted);font-size:13px">Baskı veya paylaş: <button class="btn" id="printBtn" style="display:inline-block;padding:8px 12px;border-radius:8px;font-size:13px">Yazdır</button></div>
+
+        </aside>
+      </div>
+
+      <footer>
+        <div>Hacerime • <span id="dateNow"></span></div>
+        <div>İyi ki varsın 💫</div>
+      </footer>
+
+    </div>
+  </div>
+
+  <script>
+    // Hemen değiştirilebilecek alanlar (kullanıcının düzenlemesi için)
+    const SETTINGS = {
+      loverName: 'Hacer', // sevgilinizin adı
+      yourName: 'Sertaç', // sizin adınız
+      youtubeId: 'https://www.youtube.com/watch?v=f0JVwF_bHDI&list=RDf0JVwF_bHDI&start_radio=1', // örn '3JZ_D3ELwOQ' (embed id)
+      heroImg: 'hero.jpg', // değiştirin veya URL koyun
+      letterText: `Bugün sana bu küçük sayfayı hazırladım çünkü her anını daha özel kılmak istiyorum. Seninle güldüğüm, seninle hayal kurduğum için çok şanslıyım. Her baktığımda içimi ısıtan o gülüşün, en karanlık günümü aydınlatıyor. Seni düşündüğümde kalbim hızlanıyor; iyi ki varsın hatunum.`
+    }
+
+    // Elementleri yerleştir
+    document.getElementById('loverName').textContent = SETTINGS.loverName
+    document.getElementById('yourName').textContent = SETTINGS.yourName
+    document.getElementById('loveText').textContent = SETTINGS.letterText
+    document.getElementById('heroImg').src = SETTINGS.heroImg
+    document.getElementById('musicFrame').src = ` https://www.youtube.com/watch?v=f0JVwF_bHDI&list=RDf0JVwF_bHDI&start_radio=1 `
+
+    // Tarih
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('tr-TR', {year:'numeric',month:'long',day:'numeric'})
+    document.getElementById('dateNow').textContent = dateStr
+
+    // Reveal butonu — küçük animasyon + confetti
+    const revealBtn = document.getElementById('revealBtn')
+    revealBtn.addEventListener('click', ()=>{
+      // metni değiştir
+      const letter = document.getElementById('letter')
+      letter.innerHTML += `<div style="margin-top:14px;padding:12px;border-radius:10px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));font-size:16px">Bugün seninle küçük bir macera planladım — Haftaya Kampa Ne Dersin. 💖</div>`
+      launchConfetti()
+    })
+
+    // Kupon butonu
+    document.getElementById('claimCoupon').addEventListener('click', ()=>{
+      const c = document.getElementById('coupon')
+      c.innerHTML = '<strong>Kupon kullanıldı — sarılma tarihi belirlendi! 💞</strong>'
+      launchConfetti(100)
+    })
+
+    // Yazdırma
+    document.getElementById('printBtn').addEventListener('click', ()=>window.print())
+
+    // Kalpler toggle
+    let heartsOn=false
+    document.getElementById('toggleHearts').addEventListener('click', ()=>{
+      heartsOn=!heartsOn
+      const layer=document.getElementById('heartLayer')
+      if(heartsOn){ startHearts(layer) } else { layer.innerHTML = '' }
+    })
+
+    // Basit kalp animasyonu
+    function startHearts(layer){ layer.innerHTML = '';
+      for(let i=0;i<16;i++){ const h=document.createElement('div'); h.style.position='absolute'; h.style.left = Math.random()*100+'%'; h.style.top = Math.random()*100+'%'; h.style.pointerEvents='none'; h.style.opacity = 0; h.innerHTML = '💖'; h.style.fontSize = (12+Math.random()*36)+'px'; h.style.transform = `translateY(${Math.random()*20}px)`; layer.appendChild(h);
+        setTimeout(()=>{ h.style.transition='all 4s linear'; h.style.top = '-10%'; h.style.opacity=1; h.style.transform='translateY(-100px) scale(1.2)'; setTimeout(()=>h.remove(),4800) }, i*200)
+      }
+      // sürekli tekrar
+      if(heartsOn) setTimeout(()=>startHearts(layer),2500)
+    }
+
+    // Basit confetti (canvas)
+    function launchConfetti(amount=60){
+      const canvas = document.getElementById('confettiCanvas')
+      canvas.width = window.innerWidth; canvas.height = window.innerHeight
+      const ctx = canvas.getContext('2d')
+      const pieces = []
+      for(let i=0;i<amount;i++){
+        pieces.push({x:Math.random()*canvas.width,y:Math.random()*-canvas.height,vy:2+Math.random()*5, size:4+Math.random()*8, rot:Math.random()*360, vr:Math.random()*6-3, color: ['#ff6b81','#ffd1dc','#fff1f2','#ffd6a5'][Math.floor(Math.random()*4)]})
+      }
+      let raf
+      function frame(){ ctx.clearRect(0,0,canvas.width,canvas.height);
+        for(const p of pieces){ p.y += p.vy; p.x += Math.sin(p.y/20)*2; p.rot += p.vr; ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180); ctx.fillStyle = p.color; ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size); ctx.restore() }
+        // remove offscreen
+        for(let i=pieces.length-1;i>=0;i--) if(pieces[i].y>canvas.height+50) pieces.splice(i,1)
+        if(pieces.length>0) raf=requestAnimationFrame(frame); else cancelAnimationFrame(raf)
+      }
+      frame()
+      setTimeout(()=>{ pieces.length=0 }, 4000)
+    }
+
+    // Responsive: resize canvas
+    window.addEventListener('resize', ()=>{ const c=document.getElementById('confettiCanvas'); c.width=window.innerWidth; c.height=window.innerHeight })
+
+  </script>
+
+
+
+</body>
+</html>
